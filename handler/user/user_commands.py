@@ -61,10 +61,10 @@ async def get_count(message: Message, state: FSMContext, bot: Bot):
                                                                f"Товар: {data['title']}\n"
                                                                f"Количество: {data['count']}\n"
                                                                f"user_id: @{message.from_user.username}")
+                await db.change_count(int(id), int(get_count[0][2]) - count)
                 await state.clear()
             except Exception as e:
                 print(f"Error: {e}")
 
-        await db.change_count(int(id), int(get_count[0][2]) - count)
     except ValueError:
         await message.answer("Введите число")
