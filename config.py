@@ -1,0 +1,2 @@
+BOT_TOKEN = "6633989582:AAG-M1B0qkQdq2BPB-1QGtKVL6tZ3Iar_no"
+ADMIN = "nik0laevig0r"
