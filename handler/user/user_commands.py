@@ -26,7 +26,7 @@ async def check_goods(message: Message) -> None:
     text = ""
     for item in goods:
         if item[2] > 0:
-            text = text + f"{item[1]} {item[4]} | {item[3]} руб/шт | В наличии: {item[2]} шт. \n"
+            text = text + f"<b>{item[1]}</b> {item[4]} | {item[3]} руб/шт | В наличии: {item[2]} шт. \n\n"
     if text == "":
         await message.answer("Товар закончился")
     else:
