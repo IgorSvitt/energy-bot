@@ -27,7 +27,7 @@ async def check(message: Message):
         goods = await db.get()
         text = ""
         for item in goods:
-            text = text + f"{item[0]} | {item[1]} {item[2]} | {item[4]} руб/шт | В наличии: {item[3]} шт. \n"
+            text = text + f"{item[0]} | {item[1]} {item[4]} | {item[3]} руб/шт | В наличии: {item[4]} шт. \n"
         await message.answer("Вот что у нас есть в наличии:\n\n" + text)
     else:
         await message.answer("У вас нет доступа к этой команде")
