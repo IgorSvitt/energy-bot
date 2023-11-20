@@ -132,3 +132,14 @@ async def delete(message: Message, state: FSMContext):
         await state.set_state(DeleteEnergy.GET_ID)
     else:
         await message.answer("У вас нет доступа к этой команде")
+
+
+@router.message(DeleteEnergy.GET_ID)
+async def delete_id(message: Message, state: FSMContext):
+    id = message.text
+    await state.update_data(id=int(id))
+    data = await state.get_data()
+    id = data.get("id")
+    await db.delete(id)
+    await message.answer("Напиток удален")
+    await state.clear()
