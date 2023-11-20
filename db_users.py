@@ -10,7 +10,7 @@ class DatabaseUsers:
     async def create_table(self):
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS users"
-            " (userid INTEGER PRIMARY KEY, name username)")
+            " (userid INTEGER PRIMARY KEY, name username, count_orders integer)")
         self.conn.commit()
 
     async def get(self):
@@ -23,9 +23,9 @@ class DatabaseUsers:
         rows = self.cur.fetchall()
         return rows
 
-    async def add(self, userid, name):
-        self.cur.execute("INSERT INTO users VALUES (?, ?)",
-                         (userid, name))
+    async def add(self, userid, name, count_orders):
+        self.cur.execute("INSERT INTO users VALUES (?, ?, ?)",
+                         (userid, name, count_orders))
         self.conn.commit()
 
     async def delete(self, userid):

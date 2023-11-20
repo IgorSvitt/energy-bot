@@ -11,7 +11,9 @@ router = Router()
 @router.message(Command("start"))
 async def command_start_handler(message: Message) -> None:
     db = DatabaseUsers()
-    await db.add(userid=message.from_user.id, name=message.from_user.username)
+    get_by_id = await db.get_by_id(message.from_user.id)
+    if not get_by_id:
+        await db.add(userid=message.from_user.id, name=message.from_user.username, count_orders=0)
     await message.answer("Привет, " + message.from_user.full_name + "👋\n\n"
                          "Я бот-магазин энергетических напитков. Я помогу тебе зарядить твою батарейку 🔋.\n\n"
                          "Нажмите на кнопку «Купить» или «Наличие товаров» чтобы перейти к ассортименту",

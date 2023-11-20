@@ -36,3 +36,8 @@ class BuyEnergy(StatesGroup):
     GET_COUNT = State()
     GET_ROOM = State()
     GET_TITLE = State()
+
+
+class Mailing(StatesGroup):
+    GET_TEXT = State()
+    GET_PHOTO = State()

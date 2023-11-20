@@ -10,7 +10,7 @@ class Database:
     async def create_table(self):
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS energetics"
-            " (id INTEGER PRIMARY KEY, title text, count integer, price integer, description text)")
+            " (id INTEGER PRIMARY KEY, title text, count integer, price integer, description text, photo text)")
         self.conn.commit()
 
     async def get(self):
@@ -20,7 +20,7 @@ class Database:
 
     async def get_by_id(self, id):
         self.cur.execute("SELECT * FROM energetics WHERE id=?", (id,))
-        rows = self.cur.fetchall()
+        rows = self.cur.fetchone()
         return rows
 
     async def update_count(self, id, count):

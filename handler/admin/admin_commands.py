@@ -5,7 +5,7 @@ from aiogram.types import Message
 
 from config import ADMINS
 from db import Database
-from state.energy import Energy, UpdateEnergy, UpdateCountEnergy, DeleteEnergy
+from state.energy import Energy, UpdateEnergy, UpdateCountEnergy, DeleteEnergy, Mailing
 from db_users import DatabaseUsers
 
 router = Router()
@@ -79,7 +79,7 @@ async def get_price(message: Message, state: FSMContext):
 async def get_photo(message: Message, state: FSMContext, bot: Bot):
     await bot.download(
         message.photo[-1],
-        destination=f"/photos/{message.photo[-1].file_id}.jpg"
+        destination=f"photos/{message.photo[-1].file_id}.jpg"
     )
     await state.update_data(photo=message.photo[-1].file_id)
     data = await state.get_data()
@@ -142,4 +142,37 @@ async def delete_id(message: Message, state: FSMContext):
     id = data.get("id")
     await db.delete(id)
     await message.answer("Напиток удален")
+    await state.clear()
+
+
+@router.message(Command('mailing'))
+async def mailing(message: Message, state: FSMContext):
+    if message.from_user.username in ADMINS:
+        await message.answer('Введите текст рассылки')
+        await state.set_state(Mailing.GET_TEXT)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
+
+
+@router.message(Mailing.GET_TEXT)
+async def get_text(message: Message, state: FSMContext):
+    text = message.text
+    await state.update_data(text=text)
+    await message.answer('Введите фото')
+    await state.set_state(Mailing.GET_PHOTO)
+
+
+@router.message(Mailing.GET_PHOTO)
+async def get_photo(message: Message, state: FSMContext, bot: Bot):
+    users = await db_users.get()
+    print(users)
+    if message.text == "no":
+        data = await state.get_data()
+        text = data.get("text")
+        for user in users:
+            try:
+                await bot.send_message(user[0], text)
+            except:
+                pass
+
     await state.clear()

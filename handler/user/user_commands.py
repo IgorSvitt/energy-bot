@@ -34,13 +34,14 @@ async def check_goods(message: Message) -> None:
         if item[2] > 0:
             media.add(
                 type="photo",
-                media=FSInputFile("/photos/"+item[5]),
+                media=FSInputFile("photos/"+item[5]+".jpg"),
             )
             text = text + f"<b>{item[1]}</b> {item[4]} | {item[3]} руб/шт | В наличии: {item[2]} шт. \n\n"
     if text == "":
         await message.answer("Товар закончился")
     else:
-        await message.answer("Вот что у нас есть в наличии:\n\n" + text)
+        media.caption = text
+        await message.answer_media_group(media.build())
 
 
 @router.callback_query(F.data)
@@ -97,3 +98,4 @@ async def get_room(message: Message, state: FSMContext, bot: Bot):
 
     except Exception as e:
         logging.error(e)
+
