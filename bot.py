@@ -18,6 +18,8 @@ async def start() -> None:
     db_users = DatabaseUsers()
     await db_users.create_table()
     await db.create_table()
+    await db.update_table()
+    await db_users.update_table()
     logging.basicConfig(level=logging.INFO)
     dp.include_router(st.router)
     dp.include_router(user_commands.router)

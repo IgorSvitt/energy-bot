@@ -5,7 +5,7 @@ from aiogram import Bot
 
 from db import Database
 from state.energy import BuyEnergy
-from keyboards.user.for_buy import choose_good
+from keyboards.user.for_buy import choose_good, cancel
 
 router = Router()
 db = Database()
@@ -40,11 +40,11 @@ async def check_goods(callback: CallbackQuery, bot: Bot, state: FSMContext) -> N
     await state.update_data(id=good_by_id[0][0])
     await callback.message.answer(f"Отправьте количество товара")
     await state.set_state(BuyEnergy.GET_COUNT)
-    await callback.message.edit_reply_markup()
+    await callback.message.edit_reply_markup(reply_markup=await cancel())
 
 
 @router.message(BuyEnergy.GET_COUNT)
-async def get_count(message: Message, state: FSMContext, bot: Bot):
+async def get_count(message: Message, state: FSMContext,):
     try:
         count = int(message.text)
         await state.update_data(count=count)
@@ -54,17 +54,29 @@ async def get_count(message: Message, state: FSMContext, bot: Bot):
         if int(get_count[0][2]) < count:
             await message.answer("Такого количества нет в наличии")
         else:
-            await message.answer("Спасибо за заказ! В ближайшее время с вами свяжется продавец")
-            data = await state.get_data()
-            try:
-                await bot.send_message(chat_id=432188597, text=f"Новый заказ:\n"
-                                                               f"Товар: {data['title']}\n"
-                                                               f"Количество: {data['count']}\n"
-                                                               f"user_id: @{message.from_user.username}")
-                await db.change_count(int(id), int(get_count[0][2]) - count)
-                await state.clear()
-            except Exception as e:
-                print(f"Error: {e}")
+            await message.answer("Введите номер комнаты")
+            await state.set_state(BuyEnergy.GET_ROOM)
 
     except ValueError:
         await message.answer("Введите число")
+
+
+@router.message(BuyEnergy.GET_ROOM)
+async def get_room(message: Message, state: FSMContext, bot: Bot):
+    await state.update_data(room=message.text)
+    await message.answer("Спасибо за заказ! В ближайшее время с вами свяжется продавец")
+    data = await state.get_data()
+    try:
+        await bot.send_message(chat_id=432188597, text=f"Новый заказ:\n"
+                                                       f"Товар: {data['title']}\n"
+                                                       f"Количество: {data['count']}\n"
+                                                       f"user_id: @{message.from_user.username}")
+        await bot.send_message(chat_id=403062158, text=f"Новый заказ:\n"
+                                                       f"Товар: {data['title']}\n"
+                                                       f"Количество: {data['count']}\n"
+                                                       f"user_id: @{message.from_user.username}")
+        await db.change_count(int(data['id']), int(get_count[0][2]) - int(data['count']))
+        await state.clear()
+
+    except Exception as e:
+        await message.answer("Произошла ошибка, попробуйте позже")

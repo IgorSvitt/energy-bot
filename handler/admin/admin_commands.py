@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from config import ADMIN
+from config import ADMINS
 from db import Database
 from state.energy import Energy
 from db_users import DatabaseUsers
@@ -12,9 +12,10 @@ router = Router()
 db = Database()
 db_users = DatabaseUsers()
 
+
 @router.message(Command("add"))
 async def add(message: Message, state: FSMContext):
-    if message.from_user.username == ADMIN:
+    if message.from_user.username in ADMINS:
         await message.answer("Введите название напитка")
         await state.set_state(Energy.GET_TITLE)
     else:
@@ -23,7 +24,7 @@ async def add(message: Message, state: FSMContext):
 
 @router.message(Command("check"))
 async def check(message: Message):
-    if message.from_user.username == ADMIN:
+    if message.from_user.username in ADMINS:
         goods = await db.get()
         text = ""
         for item in goods:
@@ -35,7 +36,7 @@ async def check(message: Message):
 
 @router.message(Command("change"))
 async def change(message: Message, state: FSMContext):
-    if message.from_user.username == ADMIN:
+    if message.from_user.username in ADMINS:
         await message.answer("Введите Id напитка, который хотите изменить")
         await state.set_state(Energy.GET_ID)
     else:
@@ -102,11 +103,11 @@ async def change_count(message: Message, state: FSMContext):
 
 @router.message(Command("getusers"))
 async def get_users(message: Message):
-    if message.from_user.username == ADMIN:
+    if message.from_user.username in ADMINS:
         users = await db_users.get()
         text = ""
         for item in users:
-            text = text + f"{item[0]} | {item[1]} \n"
+            text = text + f"{item[0]} | @{item[1]} \n"
         await message.answer("Вот все пользователи:\n\n" + text)
     else:
         await message.answer("У вас нет доступа к этой команде")

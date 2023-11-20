@@ -13,3 +13,9 @@ async def choose_good() -> InlineKeyboardMarkup:
         if item[2] > 0:
             builder.row(types.InlineKeyboardButton(text=item[1], callback_data=str(item[0])))
     return builder.as_markup()
+
+
+async def cancel() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.row(types.InlineKeyboardButton(text="Вернутся", callback_data="cancel"))
+    return builder.as_markup()

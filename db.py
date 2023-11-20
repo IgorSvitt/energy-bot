@@ -13,6 +13,12 @@ class Database:
             " (id INTEGER PRIMARY KEY, title text, count integer, price integer, description text)")
         self.conn.commit()
 
+    async def update_table(self):
+        self.cur.execute(
+            "ALTER TABLE energetics ADD COLUMN photo text"
+        )
+        self.conn.commit()
+
     async def get(self):
         self.cur.execute("SELECT * FROM energetics")
         rows = self.cur.fetchall()

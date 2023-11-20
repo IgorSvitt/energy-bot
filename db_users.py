@@ -13,6 +13,12 @@ class DatabaseUsers:
             " (userid INTEGER PRIMARY KEY, name username)")
         self.conn.commit()
 
+    async def update_table(self):
+        self.cur.execute(
+            "ALTER TABLE users ADD COLUMN count_orders integer"
+        )
+        self.conn.commit()
+
     async def get(self):
         self.cur.execute("SELECT * FROM users")
         rows = self.cur.fetchall()
