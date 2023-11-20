@@ -23,13 +23,13 @@ class Database:
         rows = self.cur.fetchall()
         return rows
 
-    async def change_count(self, id, count):
+    async def update_count(self, id, count):
         self.cur.execute("UPDATE energetics SET count = ? WHERE id = ?", (count, id))
         self.conn.commit()
 
-    async def add(self, title, count, price, description):
-        self.cur.execute("INSERT INTO energetics VALUES (NULL, ?, ?, ?, ?)",
-                         (title, count, price, description))
+    async def add(self, title, count, price, description, photo):
+        self.cur.execute("INSERT INTO energetics VALUES (NULL, ?, ?, ?, ?, ?)",
+                         (title, count, price, description, photo))
         self.conn.commit()
 
     async def delete(self, id):

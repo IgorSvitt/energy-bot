@@ -1,8 +1,10 @@
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, FSInputFile
 from aiogram import Bot
 import logging
+
+from aiogram.utils.media_group import MediaGroupBuilder
 
 from db import Database
 from db_users import DatabaseUsers
@@ -27,8 +29,13 @@ async def buy(message: Message) -> None:
 async def check_goods(message: Message) -> None:
     goods = await db.get()
     text = ""
+    media = MediaGroupBuilder()
     for item in goods:
         if item[2] > 0:
+            media.add(
+                type="photo",
+                media=FSInputFile("/photos/"+item[5]),
+            )
             text = text + f"<b>{item[1]}</b> {item[4]} | {item[3]} руб/шт | В наличии: {item[2]} шт. \n\n"
     if text == "":
         await message.answer("Товар закончился")
@@ -82,7 +89,7 @@ async def get_room(message: Message, state: FSMContext, bot: Bot):
                                                        f"Количество: {data['count']}\n"
                                                        f"Комната: {data['room']}\n"
                                                        f"user_id: @{message.from_user.username}")
-        await db.change_count(int(id), int(get_count[0][2]) - int(data['count']))
+        await db.update_count(int(id), int(get_count[0][2]) - int(data['count']))
         await state.clear()
         count = await db_users.get_count(int(id))
         count = count[0] + 1

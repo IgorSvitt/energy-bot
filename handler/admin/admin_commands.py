@@ -1,11 +1,11 @@
-from aiogram import Router
+from aiogram import Router, F, Bot
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from config import ADMINS
 from db import Database
-from state.energy import Energy
+from state.energy import Energy, UpdateEnergy, UpdateCountEnergy, DeleteEnergy
 from db_users import DatabaseUsers
 
 router = Router()
@@ -34,11 +34,11 @@ async def check(message: Message):
         await message.answer("У вас нет доступа к этой команде")
 
 
-@router.message(Command("change"))
+@router.message(Command("updatecount"))
 async def change(message: Message, state: FSMContext):
     if message.from_user.username in ADMINS:
         await message.answer("Введите Id напитка, который хотите изменить")
-        await state.set_state(Energy.GET_ID)
+        await state.set_state(UpdateCountEnergy.GET_ID)
     else:
         await message.answer("У вас нет доступа к этой команде")
 
@@ -71,17 +71,29 @@ async def get_count(message: Message, state: FSMContext):
 async def get_price(message: Message, state: FSMContext):
     price = message.text
     await state.update_data(price=price)
+    await message.answer("Введите фото напитка")
+    await state.set_state(Energy.GET_PHOTO)
+
+
+@router.message(Energy.GET_PHOTO, F.photo)
+async def get_photo(message: Message, state: FSMContext, bot: Bot):
+    await bot.download(
+        message.photo[-1],
+        destination=f"/photo/{message.photo[-1].file_id}.jpg"
+    )
+    await state.update_data(photo=message.photo[-1].file_id)
     data = await state.get_data()
     title = data.get("title")
     description = data.get("description")
     count = data.get("count")
     price = data.get("price")
-    await db.add(title=title, count=count, price=price, description=description)
+    photo = data.get("photo")
+    await db.add(title=title, count=count, price=price, description=description, photo=photo)
     await message.answer("Напиток добавлен")
     await state.clear()
 
 
-@router.message(Energy.GET_ID)
+@router.message(UpdateCountEnergy.GET_ID)
 async def get_id(message: Message, state: FSMContext):
     id = message.text
     await state.update_data(id=id)
@@ -96,7 +108,7 @@ async def change_count(message: Message, state: FSMContext):
     data = await state.get_data()
     id = data.get("id")
     count = data.get("count")
-    await db.change_count(id, count)
+    await db.update_count(id, count)
     await message.answer("Количество напитка изменено")
     await state.clear()
 
@@ -109,5 +121,14 @@ async def get_users(message: Message):
         for item in users:
             text = text + f"{item[0]} | @{item[1]} | Кол-во покупок: {item[2]}\n"
         await message.answer("Вот все пользователи:\n\n" + text)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
+
+
+@router.message(Command("delete"))
+async def delete(message: Message, state: FSMContext):
+    if message.from_user.username in ADMINS:
+        await message.answer("Введите Id напитка, который хотите удалить")
+        await state.set_state(DeleteEnergy.GET_ID)
     else:
         await message.answer("У вас нет доступа к этой команде")
