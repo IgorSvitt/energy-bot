@@ -2,6 +2,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from aiogram import Bot
+import logging
 
 from db import Database
 from state.energy import BuyEnergy
@@ -34,13 +35,13 @@ async def check_goods(message: Message) -> None:
 
 
 @router.callback_query(F.data)
-async def check_goods(callback: CallbackQuery, bot: Bot, state: FSMContext) -> None:
+async def check_goods(callback: CallbackQuery, state: FSMContext) -> None:
     good_by_id = await db.get_by_id(int(callback.data))
     await state.update_data(title=good_by_id[0][1])
     await state.update_data(id=good_by_id[0][0])
     await callback.message.answer(f"Отправьте количество товара")
     await state.set_state(BuyEnergy.GET_COUNT)
-    await callback.message.edit_reply_markup(reply_markup=await cancel())
+    await callback.message.edit_reply_markup()
 
 
 @router.message(BuyEnergy.GET_COUNT)
@@ -66,17 +67,21 @@ async def get_room(message: Message, state: FSMContext, bot: Bot):
     await state.update_data(room=message.text)
     await message.answer("Спасибо за заказ! В ближайшее время с вами свяжется продавец")
     data = await state.get_data()
+    id = data.get("id")
+    get_count = await db.get_by_id(int(id))
     try:
         await bot.send_message(chat_id=432188597, text=f"Новый заказ:\n"
                                                        f"Товар: {data['title']}\n"
                                                        f"Количество: {data['count']}\n"
+                                                       f"Комната: {data['room']}\n"
                                                        f"user_id: @{message.from_user.username}")
         await bot.send_message(chat_id=403062158, text=f"Новый заказ:\n"
                                                        f"Товар: {data['title']}\n"
                                                        f"Количество: {data['count']}\n"
+                                                       f"Комната: {data['room']}\n"
                                                        f"user_id: @{message.from_user.username}")
-        await db.change_count(int(data['id']), int(get_count[0][2]) - int(data['count']))
+        await db.change_count(int(id), int(get_count[0][2]) - int(data['count']))
         await state.clear()
 
     except Exception as e:
-        await message.answer("Произошла ошибка, попробуйте позже")
+        logging.error(e)

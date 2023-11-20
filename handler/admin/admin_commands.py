@@ -107,7 +107,7 @@ async def get_users(message: Message):
         users = await db_users.get()
         text = ""
         for item in users:
-            text = text + f"{item[0]} | @{item[1]} \n"
+            text = text + f"{item[0]} | @{item[1]} | Кол-во покупок: {item[2]}\n"
         await message.answer("Вот все пользователи:\n\n" + text)
     else:
         await message.answer("У вас нет доступа к этой команде")
