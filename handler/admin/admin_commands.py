@@ -22,7 +22,7 @@ async def add(message: Message, state: FSMContext):
         await message.answer("У вас нет доступа к этой команде")
 
 
-@router.message(Command("check"))
+@router.message(Command("get"))
 async def check(message: Message):
     if message.from_user.username in ADMINS:
         goods = await db.get()
@@ -79,7 +79,7 @@ async def get_price(message: Message, state: FSMContext):
 async def get_photo(message: Message, state: FSMContext, bot: Bot):
     await bot.download(
         message.photo[-1],
-        destination=f"/photo/{message.photo[-1].file_id}.jpg"
+        destination=f"/photos/{message.photo[-1].file_id}.jpg"
     )
     await state.update_data(photo=message.photo[-1].file_id)
     data = await state.get_data()
