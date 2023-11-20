@@ -93,6 +93,8 @@ async def get_room(message: Message, state: FSMContext, bot: Bot):
         await db.update_count(int(id), int(get_count[0][2]) - int(data['count']))
         await state.clear()
         count = await db_users.get_count(int(id))
+        if count[0] is None:
+            count = 0
         count = count[0] + 1
         await db_users.update_count(int(id), count)
 
