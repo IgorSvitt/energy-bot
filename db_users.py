@@ -13,12 +13,6 @@ class DatabaseUsers:
             " (userid INTEGER PRIMARY KEY, name username)")
         self.conn.commit()
 
-    async def update_table(self):
-        self.cur.execute(
-            "ALTER TABLE users ADD COLUMN count_orders integer"
-        )
-        self.conn.commit()
-
     async def get(self):
         self.cur.execute("SELECT * FROM users")
         rows = self.cur.fetchall()
@@ -38,3 +32,11 @@ class DatabaseUsers:
         self.cur.execute("DELETE FROM users WHERE userid=?", (userid,))
         self.conn.commit()
 
+    async def update_count(self, userid, count):
+        self.cur.execute("UPDATE users SET count_orders = ? WHERE userid = ?", (count, userid))
+        self.conn.commit()
+
+    async def get_count(self, userid):
+        self.cur.execute("SELECT count_orders FROM users WHERE userid=?", (userid,))
+        rows = self.cur.fetchone()
+        return rows

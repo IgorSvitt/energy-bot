@@ -5,11 +5,13 @@ from aiogram import Bot
 import logging
 
 from db import Database
+from db_users import DatabaseUsers
 from state.energy import BuyEnergy
 from keyboards.user.for_buy import choose_good, cancel
 
 router = Router()
 db = Database()
+db_users = DatabaseUsers()
 
 
 @router.message(F.text == "Купить💰")
@@ -82,6 +84,9 @@ async def get_room(message: Message, state: FSMContext, bot: Bot):
                                                        f"user_id: @{message.from_user.username}")
         await db.change_count(int(id), int(get_count[0][2]) - int(data['count']))
         await state.clear()
+        count = await db_users.get_count(int(id))
+        count = count[0] + 1
+        await db_users.update_count(int(id), count)
 
     except Exception as e:
         logging.error(e)
