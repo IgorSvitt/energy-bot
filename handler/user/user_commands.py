@@ -47,8 +47,8 @@ async def check_goods(message: Message) -> None:
 @router.callback_query(F.data)
 async def check_goods(callback: CallbackQuery, state: FSMContext) -> None:
     good_by_id = await db.get_by_id(int(callback.data))
-    await state.update_data(title=good_by_id[0][1])
-    await state.update_data(id=good_by_id[0][0])
+    await state.update_data(title=good_by_id[1])
+    await state.update_data(id=good_by_id[0])
     await callback.message.answer(f"Отправьте количество товара")
     await state.set_state(BuyEnergy.GET_COUNT)
     await callback.message.edit_reply_markup()
@@ -62,7 +62,7 @@ async def get_count(message: Message, state: FSMContext,):
         data = await state.get_data()
         id = data.get("id")
         get_count = await db.get_by_id(int(id))
-        if int(get_count[0][2]) < count:
+        if int(get_count[2]) < count:
             await message.answer("Такого количества нет в наличии")
         else:
             await message.answer("Введите номер комнаты")
@@ -90,7 +90,7 @@ async def get_room(message: Message, state: FSMContext, bot: Bot):
                                                        f"Количество: {data['count']}\n"
                                                        f"Комната: {data['room']}\n"
                                                        f"user_id: @{message.from_user.username}")
-        await db.update_count(int(id), int(get_count[0][2]) - int(data['count']))
+        await db.update_count(int(id), int(get_count[2]) - int(data['count']))
         await state.clear()
         count = await db_users.get_count(int(id))
         if count[0] is None:
