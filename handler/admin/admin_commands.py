@@ -182,6 +182,7 @@ async def get_title(message: Message, state: FSMContext):
     title = data.get("title")
     await db_categories.add(title)
     await message.answer("Категория добавлена")
+    await state.clear()
 
 
 @router.message(Command("getcategories"))
