@@ -34,7 +34,7 @@ def goods_for_sells_buttons(goods) -> InlineKeyboardMarkup:
     for good in goods:
         if good[3] == 0:
             continue
-        text = f"{good[1]} {good[5]}| {good[2]} руб/шт |В наличии {good[3]} шт."
+        text = f"{good[1]} {good[5]}| {good[2]} руб/шт | В наличии {good[3]} шт."
         builder.row(types.InlineKeyboardButton(text=text, callback_data=("good_buy_" + str(good[0]))))
 
     builder.row(types.InlineKeyboardButton(text="Назад", callback_data="back_buy"))
