@@ -32,11 +32,9 @@ async def start() -> None:
     dp = Dispatcher()
     logging.basicConfig(level=logging.INFO)
     dp.include_router(st.router)
-    dp.include_router(user_commands.router)
     dp.include_router(admin_commands.router)
+    dp.include_router(user_commands.router)
     dp.include_router(empty.router)
     bot = Bot(BOT_TOKEN, parse_mode=ParseMode.HTML)
-    for admin in ADMIN_IDS:
-        await bot.set_my_commands(cmd_admins.admin_commands, scope=BotCommandScopeDefault())
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
