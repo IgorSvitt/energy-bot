@@ -126,7 +126,7 @@ async def except_good(callback: CallbackQuery, state: FSMContext, bot: Bot) -> N
     await callback.message.answer(text)
 
 
-@router.callback_query(F.data == "accept")
+@router.callback_query(F.data.startswith("accept_"))
 async def accept_good(callback: CallbackQuery, state: FSMContext) -> None:
     await callback.message.edit_reply_markup()
     data = await state.get_data()
@@ -136,11 +136,12 @@ async def accept_good(callback: CallbackQuery, state: FSMContext) -> None:
     await good_methods.write_order(user_id=callback.from_user.id, good_id=id, count=count)
 
 
-@router.callback_query(F.data == "cancel")
-async def deny_order(callback: CallbackQuery, state: FSMContext) -> None:
+@router.callback_query(F.data.startswith("deny_"))
+async def deny_order(callback: CallbackQuery, state: FSMContext, bot: Bot)-> None:
     await callback.message.edit_reply_markup()
     await state.clear()
-    await callback.message.answer("Заказ отменен")
+    user_id = callback.data.split("_")[1]
+    await bot.send_message(callback.from_user.id, "Заказ отменен")
 
 
 @router.message(F.text == "Написать в поддержку📩")
