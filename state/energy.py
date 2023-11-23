@@ -1,7 +1,8 @@
 from aiogram.fsm.state import State, StatesGroup
 
 
-class Energy(StatesGroup):
+class Good(StatesGroup):
+    GET_ID = State()
     GET_TITLE = State()
     GET_COUNT = State()
     GET_PRICE = State()
@@ -11,14 +12,15 @@ class Energy(StatesGroup):
     CHANGE_COUNT = State()
     CHANGE_PRICE = State()
     CHANGE_DESCRIPTION = State()
+    CHANGE_PHOTO = State()
+    GET_CATEGORYID = State()
+
+
+class DeleteGood(StatesGroup):
     GET_ID = State()
 
 
-class DeleteEnergy(StatesGroup):
-    GET_ID = State()
-
-
-class UpdateEnergy(StatesGroup):
+class UpdateGood(StatesGroup):
     GET_ID = State()
     GET_TITLE = State()
     GET_COUNT = State()
@@ -27,17 +29,25 @@ class UpdateEnergy(StatesGroup):
     GET_PHOTO = State()
 
 
-class UpdateCountEnergy(StatesGroup):
+class UpdateCountGood(StatesGroup):
     GET_ID = State()
     GET_COUNT = State()
 
 
-class BuyEnergy(StatesGroup):
+class BuyGood(StatesGroup):
+    GET_TITLE = State()
     GET_COUNT = State()
     GET_ROOM = State()
-    GET_TITLE = State()
 
 
 class Mailing(StatesGroup):
     GET_TEXT = State()
     GET_PHOTO = State()
+
+
+class Category(StatesGroup):
+    GET_TITLE = State()
+
+
+class DeleteCategory(StatesGroup):
+    GET_ID = State()

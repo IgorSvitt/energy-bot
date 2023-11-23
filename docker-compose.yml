@@ -9,3 +9,4 @@ services:
       BOT_TOKEN: 6488937939:AAHHwVHLplHHkqncw_wL1a5wg7E13nLj6F8
     volumes:
       - "./db_data:/app/db_data"
+      - "./photos:/app/photos"

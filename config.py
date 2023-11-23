@@ -1,2 +1,3 @@
 BOT_TOKEN = "6444220165:AAEKiqITz1bgVOj7e8GgH-rz2zidbkKQ6kE"
 ADMINS = ["nik0laevig0r", 'alomatov']
+ADMIN_IDS = [432188597, 403062158]
