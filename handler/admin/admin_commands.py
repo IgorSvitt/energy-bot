@@ -141,7 +141,7 @@ async def get_users(message: Message):
         for item in users:
             text = text + f"{item[0]} | @{item[1]} | Кол-во покупок: {item[2]}\n"
 
-        with open("users.txt", encoding='utf-8') as file:
+        with open("users.txt", 'w', encoding='utf-8') as file:
             file.write(text)
 
         doc = FSInputFile("users.txt")
