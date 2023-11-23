@@ -119,29 +119,13 @@ async def except_good(callback: CallbackQuery, state: FSMContext, bot: Bot) -> N
     user_id = callback.from_user.id
     username = callback.from_user.username
     await user_methods.send_order_to_admins(user_id=user_id, good_id=id, count=count, room=room, user_name=username, bot=bot)
+    await state.clear()
+    await good_methods.write_order(user_id=callback.from_user.id, good_id=id, count=count)
     text = "Спасибо за покупку!\n" \
            "Ваш заказ принят в обработку.\n" \
            "Скоро с вами свяжется наш менеджер. \n\n" \
            "P.S Если вам понравился наш сервис, то, пожалуйста, оставьте отзыв в беседе <a href='https://vk.me/join/sTUXxbQAt1KI_CO7dTq1ypYgYyv1Ica1b10='>лакокрасочных🥺</a>"
     await callback.message.answer(text)
-
-
-@router.callback_query(F.data.startswith("accept_"))
-async def accept_good(callback: CallbackQuery, state: FSMContext) -> None:
-    await callback.message.edit_reply_markup()
-    data = await state.get_data()
-    id = data.get("id")
-    count = data.get("count")
-    await state.clear()
-    await good_methods.write_order(user_id=callback.from_user.id, good_id=id, count=count)
-
-
-@router.callback_query(F.data.startswith("deny_"))
-async def deny_order(callback: CallbackQuery, state: FSMContext, bot: Bot)-> None:
-    await callback.message.edit_reply_markup()
-    await state.clear()
-    user_id = callback.data.split("_")[1]
-    await bot.send_message(callback.from_user.id, "Заказ отменен")
 
 
 @router.message(F.text == "Написать в поддержку📩")

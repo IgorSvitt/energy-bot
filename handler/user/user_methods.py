@@ -18,7 +18,6 @@ async def send_order_to_admins(good_id, count, room, user_name, user_id, bot: Bo
                                       f"Количество: {count}\n"
                                       f"Заказ на сумму: {good[2] * count}\n"
                                       f"Комната: {room}\n"
-                                      f"user: @{user_name}",
-                               reply_markup=for_order.admin_accept_or_deny(user_id))
+                                      f"user: @{user_name}")
 
 
