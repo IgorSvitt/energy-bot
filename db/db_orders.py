@@ -29,3 +29,11 @@ class Orders:
             ''', (user_id, good_id, count, date)
         )
         self.conn.commit()
+
+    async def get_all(self):
+        self.cur.execute(
+            '''
+            SELECT * FROM orders
+            '''
+        )
+        return self.cur.fetchall()
