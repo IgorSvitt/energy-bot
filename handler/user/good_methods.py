@@ -20,7 +20,7 @@ async def get_goods(category_id):
     album = MediaGroupBuilder()
     for good in goods:
         if good[3] > 0:
-            text += f"<b>{good[1]}</b> {good[5]}| {good[2]} руб/шт |В наличие {good[3]} шт.\n"
+            text += f"<b>{good[1]}</b> {good[5]} | {good[2]} руб/шт | В наличии {good[3]} шт.\n\n"
             album.add_photo(media=good[6])
 
     if text == "":
