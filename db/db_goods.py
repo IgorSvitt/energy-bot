@@ -49,6 +49,36 @@ class Goods:
         )
         self.conn.commit()
 
+    async def update_price(self, good_id, price):
+        self.cur.execute(
+            f'''UPDATE goods SET price = {price} WHERE id = {good_id}'''
+        )
+        self.conn.commit()
+
+    async def update_photo(self, good_id, photo_id):
+        self.cur.execute(
+            f'''UPDATE goods SET photo_id = "{photo_id}" WHERE id = {good_id}'''
+        )
+        self.conn.commit()
+
+    async def update_description(self, good_id, description):
+        self.cur.execute(
+            f'''UPDATE goods SET description = "{description}" WHERE id = {good_id}'''
+        )
+        self.conn.commit()
+
+    async def update_title(self, good_id, title):
+        self.cur.execute(
+            f'''UPDATE goods SET name = "{title}" WHERE id = {good_id}'''
+        )
+        self.conn.commit()
+
+    async def update_category(self, good_id, category_id):
+        self.cur.execute(
+            f'''UPDATE goods SET category_id = {category_id} WHERE id = {good_id}'''
+        )
+        self.conn.commit()
+
     async def add(self, name, price, count, category_id, description, photo_id):
         self.cur.execute(
             f'''INSERT INTO goods (name, price, count, category_id, description, photo_id) VALUES

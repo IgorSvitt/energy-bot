@@ -3,8 +3,11 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile
 
+import csv
+
 from config import ADMINS
-from state.energy import Good, UpdateCountGood, DeleteGood, Mailing, Category, DeleteCategory
+from state.energy import Good, UpdateCountGood, DeleteGood, Mailing, Category, DeleteCategory, UpdatePriceGood, \
+    UpdatePhotoGood, UpdateDescriptionGood, UpdateTitleGood, UpdateCategoryGood, UpdateCategory
 from db import db_users, db_goods, db_orders, db_categories
 
 router = Router()
@@ -23,15 +26,11 @@ async def cancel(message: Message, state: FSMContext):
         await message.answer("У вас нет доступа к этой команде")
 
 
-@router.message(Command("add"))
-async def add(message: Message, state: FSMContext):
-    if message.from_user.username in ADMINS:
-        await message.answer("Введите название товара")
-        await state.set_state(Good.GET_TITLE)
-    else:
-        await message.answer("У вас нет доступа к этой команде")
+'''
+---------------------------------Команды для товаров---------------------------------
+'''
 
-
+# Команда для удаления товара
 @router.message(Command("get"))
 async def check(message: Message):
     if message.from_user.username in ADMINS:
@@ -44,11 +43,12 @@ async def check(message: Message):
         await message.answer("У вас нет доступа к этой команде")
 
 
-@router.message(Command("updatecount"))
-async def change(message: Message, state: FSMContext):
+# Команда для добавления товара
+@router.message(Command("add"))
+async def add(message: Message, state: FSMContext):
     if message.from_user.username in ADMINS:
-        await message.answer("Введите Id товара, который хотите изменить")
-        await state.set_state(UpdateCountGood.GET_ID)
+        await message.answer("Введите название товара")
+        await state.set_state(Good.GET_TITLE)
     else:
         await message.answer("У вас нет доступа к этой команде")
 
@@ -113,6 +113,16 @@ async def get_photo(message: Message, state: FSMContext, bot: Bot):
     await state.clear()
 
 
+# Команда для удаления товара
+@router.message(Command("updatecount"))
+async def change(message: Message, state: FSMContext):
+    if message.from_user.username in ADMINS:
+        await message.answer("Введите Id товара, который хотите изменить")
+        await state.set_state(UpdateCountGood.GET_ID)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
+
+
 @router.message(UpdateCountGood.GET_ID)
 async def get_id(message: Message, state: FSMContext):
     id = message.text
@@ -121,7 +131,7 @@ async def get_id(message: Message, state: FSMContext):
     await state.set_state(Good.CHANGE_COUNT)
 
 
-@router.message(Good.CHANGE_COUNT)
+@router.message(UpdateCountGood.GET_COUNT)
 async def change_count(message: Message, state: FSMContext):
     count = int(message.text)
     await state.update_data(count=count)
@@ -133,25 +143,157 @@ async def change_count(message: Message, state: FSMContext):
     await state.clear()
 
 
-@router.message(Command("getusers"))
-async def get_users(message: Message):
+# Команда для изменения цены товара
+@router.message(Command("updateprice"))
+async def update_price(message: Message, state: FSMContext):
     if message.from_user.username in ADMINS:
-        users = await db_users.get_all()
-        text = ""
-        for item in users:
-            text = text + f"{item[0]} | @{item[1]} | Кол-во покупок: {item[2]}\n"
-
-        with open("users.txt", 'w', encoding='utf-8') as file:
-            file.write(text)
-
-        doc = FSInputFile("users.txt")
-
-        await message.answer("Всего пользователей: " + str(len(users)))
-        await message.answer_document(doc)
+        await message.answer("Введите Id напитка, цену которого хотите изменить")
+        await state.set_state(UpdatePriceGood.GET_ID)
     else:
         await message.answer("У вас нет доступа к этой команде")
 
 
+@router.message(UpdatePriceGood.GET_ID)
+async def update_price_id(message: Message, state: FSMContext):
+    id = message.text
+    await state.update_data(id=id)
+    await message.answer("Введите новую цену напитка")
+    await state.set_state(UpdatePriceGood.GET_PRICE)
+
+
+@router.message(UpdatePriceGood.GET_PRICE)
+async def update_price_price(message: Message, state: FSMContext):
+    price = int(message.text)
+    await state.update_data(price=price)
+    data = await state.get_data()
+    id = data.get("id")
+    price = data.get("price")
+    await db_goods.update_price(id, price)
+    await message.answer("Цена напитка изменена")
+    await state.clear()
+
+
+# Команда для изменения описания товара
+@router.message(Command("updatedescription"))
+async def update_description(message: Message, state: FSMContext):
+    if message.from_user.username in ADMINS:
+        await message.answer("Введите Id напитка, описание которого хотите изменить")
+        await state.set_state(UpdateDescriptionGood.GET_ID)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
+
+
+@router.message(UpdateDescriptionGood.GET_ID)
+async def update_description_id(message: Message, state: FSMContext):
+    id = message.text
+    await state.update_data(id=id)
+    await message.answer("Введите новое описание напитка")
+    await state.set_state(UpdateDescriptionGood.GET_DESCRIPTION)
+
+
+@router.message(UpdateDescriptionGood.GET_DESCRIPTION)
+async def update_description_description(message: Message, state: FSMContext):
+    description = message.text
+    await state.update_data(description=description)
+    data = await state.get_data()
+    id = data.get("id")
+    description = data.get("description")
+    await db_goods.update_description(id, description)
+    await message.answer("Описание напитка изменено")
+    await state.clear()
+
+
+# Команда для изменения названия товара
+@router.message(Command("updatetitle"))
+async def update_title(message: Message, state: FSMContext):
+    if message.from_user.username in ADMINS:
+        await message.answer("Введите Id напитка, название которого хотите изменить")
+        await state.set_state(UpdateTitleGood.GET_ID)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
+
+
+@router.message(UpdateTitleGood.GET_ID)
+async def update_title_id(message: Message, state: FSMContext):
+    id = message.text
+    await state.update_data(id=id)
+    await message.answer("Введите новое название напитка")
+    await state.set_state(UpdateTitleGood.GET_TITLE)
+
+
+@router.message(UpdateTitleGood.GET_TITLE)
+async def update_title_title(message: Message, state: FSMContext):
+    title = message.text
+    await state.update_data(title=title)
+    data = await state.get_data()
+    id = data.get("id")
+    title = data.get("title")
+    await db_goods.update_title(id, title)
+    await message.answer("Название напитка изменено")
+    await state.clear()
+
+
+# Команда для изменения категории товара
+@router.message(Command("updatecategory"))
+async def update_category(message: Message, state: FSMContext):
+    if message.from_user.username in ADMINS:
+        await message.answer("Введите Id напитка, категорию которого хотите изменить")
+        await state.set_state(UpdateCategoryGood.GET_ID)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
+
+
+@router.message(UpdateCategoryGood.GET_ID)
+async def update_category_id(message: Message, state: FSMContext):
+    id = message.text
+    await state.update_data(id=id)
+    await message.answer("Введите id категории товара")
+    await state.set_state(UpdateCategoryGood.GET_CATEGORY)
+
+
+@router.message(UpdateCategoryGood.GET_CATEGORY)
+async def update_category_category(message: Message, state: FSMContext):
+    category = message.text
+    await state.update_data(category=category)
+    data = await state.get_data()
+    id = data.get("id")
+    category = data.get("category")
+    await db_goods.update_category(id, category)
+    await message.answer("Категория напитка изменена")
+    await state.clear()
+
+
+# Команда для изменения фото товара
+@router.message(Command("updatephoto"))
+async def update_photo(message: Message, state: FSMContext):
+    if message.from_user.username in ADMINS:
+        await message.answer("Введите Id напитка, фото которого хотите изменить")
+        await state.set_state(UpdatePhotoGood.GET_ID)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
+
+
+@router.message(UpdatePhotoGood.GET_ID)
+async def update_photo_id(message: Message, state: FSMContext):
+    id = message.text
+    await state.update_data(id=id)
+    await message.answer("Введите ссылку на фото")
+    await state.set_state(UpdatePhotoGood.GET_PHOTO)
+
+
+@router.message(UpdatePhotoGood.GET_PHOTO)
+async def update_photo_photo(message: Message, state: FSMContext):
+    photo = message.text
+    await state.update_data(photo=photo)
+    data = await state.get_data()
+    id = data.get("id")
+    photo = data.get("photo")
+    await db_goods.update_photo(id, photo)
+    await message.answer("Фото напитка изменено")
+    await state.clear()
+
+
+# Команда для удаления товара
 @router.message(Command("delete"))
 async def delete(message: Message, state: FSMContext):
     if message.from_user.username in ADMINS:
@@ -172,6 +314,12 @@ async def delete_id(message: Message, state: FSMContext):
     await state.clear()
 
 
+'''
+------------------------------------------Команды для категорий------------------------------------------
+'''
+
+
+# Команда для добавления категории
 @router.message(Command("addcategory"))
 async def add_category(message: Message, state: FSMContext):
     if message.from_user.username in ADMINS:
@@ -192,6 +340,7 @@ async def get_title(message: Message, state: FSMContext):
     await state.clear()
 
 
+# Команда для получения всех категорий
 @router.message(Command("getcategories"))
 async def get_categories(message: Message):
     if message.from_user.username in ADMINS:
@@ -204,6 +353,7 @@ async def get_categories(message: Message):
         await message.answer("У вас нет доступа к этой команде")
 
 
+# Команда для удаления категории
 @router.message(Command("deletecategory"))
 async def delete_category(message: Message, state: FSMContext):
     if message.from_user.username in ADMINS:
@@ -223,6 +373,88 @@ async def delete_id(message: Message, state: FSMContext):
     await message.answer("Категория удалена")
     await state.clear()
 
+
+# Команда для изменения названия категории
+@router.message(Command("updatecategoryname"))
+async def update_category(message: Message, state: FSMContext):
+    if message.from_user.username in ADMINS:
+        await message.answer("Введите Id категории, название которой хотите изменить")
+        await state.set_state(UpdateCategory.GET_ID)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
+
+
+@router.message(UpdateCategory.GET_ID)
+async def update_category_id(message: Message, state: FSMContext):
+    id = message.text
+    await state.update_data(id=int(id))
+    await message.answer("Введите новое название категории")
+    await state.set_state(UpdateCategory.GET_TITLE)
+
+
+@router.message(UpdateCategory.GET_TITLE)
+async def update_category_title(message: Message, state: FSMContext):
+    title = message.text
+    await state.update_data(title=title)
+    data = await state.get_data()
+    id = data.get("id")
+    title = data.get("title")
+    await db_categories.update_title(id, title)
+    await message.answer("Название категории изменено")
+    await state.clear()
+
+
+'''
+------------------------------------------Команды для пользователей------------------------------------------
+'''
+
+
+# Команда для получения всех пользователей
+@router.message(Command("getusers"))
+async def get_users(message: Message):
+    if message.from_user.username in ADMINS:
+        users = await db_users.get_all()
+        text = ""
+        for item in users:
+            text = text + f"{item[0]} | @{item[1]} | Кол-во покупок: {item[2]}\n"
+
+        with open("users.txt", 'w', encoding='utf-8') as file:
+            file.write(text)
+
+        doc = FSInputFile("users.txt")
+
+        await message.answer("Всего пользователей: " + str(len(users)))
+        await message.answer_document(doc)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
+
+
+# Команда для получения всех заказов в csv
+@router.message(Command("getorders"))
+async def get_orders(message: Message):
+    if message.from_user.username in ADMINS:
+        orders = await db_orders.get_all()
+
+        with open("orders.csv", mode="w", encoding='utf-8') as file:
+            file_writer = csv.writer(file, delimiter=",", lineterminator="\r")
+            file_writer.writerow(["id", "Username", "Товар", "count", "price", "Сумма покупки", "Дата покупки"])
+            for item in orders:
+                user = await db_users.get_by_id(item[1])
+                username = user[1]
+                good = await db_goods.get_by_id(item[2])
+                good_name = good[1]
+                price = good[2]
+                count = item[3]
+                sum = price * count
+                date = item[4]
+                file_writer.writerow([item[0], username, good_name, count, price, sum, date])
+
+        doc = FSInputFile("orders.сsv")
+
+        await message.answer("Всего заказов: " + str(len(orders)))
+        await message.answer_document(doc)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
 
 # @router.message(Command('mailing'))
 # async def mailing(message: Message, state: FSMContext):

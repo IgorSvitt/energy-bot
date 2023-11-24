@@ -1,5 +1,6 @@
 import sqlite3
 
+
 class Orders:
     def __init__(self):
         self.conn = sqlite3.connect("db_data/energy.db")

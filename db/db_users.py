@@ -21,7 +21,6 @@ class Users:
         self.conn.commit()
 
     async def add(self, userid, name, count_orders, is_active):
-        await self.create_table()
         self.cur.execute(
             '''
                 INSERT INTO users (user_id, username, count_orders, is_active) VALUES (?, ?, ?, ?)
@@ -30,7 +29,6 @@ class Users:
         self.conn.commit()
 
     async def get_by_id(self, userid):
-        await self.create_table()
         self.cur.execute(
             '''
                 SELECT * FROM users WHERE user_id = ?
@@ -39,7 +37,6 @@ class Users:
         return self.cur.fetchone()
 
     async def update_count_orders(self, userid, count_orders):
-        await self.create_table()
         self.cur.execute(
             '''
                 UPDATE users SET count_orders = ? WHERE user_id = ?
@@ -48,7 +45,6 @@ class Users:
         self.conn.commit()
 
     async def get_count_orders(self, userid):
-        await self.create_table()
         self.cur.execute(
             '''
                 SELECT count_orders FROM users WHERE user_id = ?
@@ -57,7 +53,6 @@ class Users:
         return self.cur.fetchone()[0]
 
     async def get_all(self):
-        await self.create_table()
         self.cur.execute(
             '''
                 SELECT * FROM users

@@ -11,4 +11,10 @@ admin_commands = [
     BotCommand(command="/addcategory", description="Добавить категорию"),
     BotCommand(command="/getcategories", description="Посмотреть категории"),
     BotCommand(command="/deletecategory", description="Удалить категорию"),
+    BotCommand(command="/updatecategoryname", description="Изменить наименование категории"),
+    BotCommand(command="/updateprice", description="Изменить цену товара"),
+    BotCommand(command="/updatephoto", description="Изменить фото товара"),
+    BotCommand(command="/updatedescription", description="Изменить описание товара"),
+    BotCommand(command="/updatetitle", description="Изменить название товара"),
+    BotCommand(command="/updatecategory", description="Изменить категорию товара"),
 ]

@@ -36,5 +36,11 @@ class Categories:
         )
         self.conn.commit()
 
+    async def update_title(self, id, title):
+        self.cur.execute(
+            f'''UPDATE categories SET name = "{title}" WHERE id = {id}'''
+        )
+        self.conn.commit()
+
     def __del__(self):
         self.conn.close()
