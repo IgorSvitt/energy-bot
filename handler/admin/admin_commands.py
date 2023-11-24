@@ -452,7 +452,7 @@ async def get_orders(message: Message):
         doc = FSInputFile("orders.сsv")
 
         await message.answer("Всего заказов: " + str(len(orders)))
-        await message.answer_document(doc)
+        await message.answer_document(document=doc)
     else:
         await message.answer("У вас нет доступа к этой команде")
 
