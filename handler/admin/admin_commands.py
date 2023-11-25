@@ -450,9 +450,9 @@ async def get_orders(message: Message):
             date = item[4]
             ws.append([item[0], username, good_name, count, price, sum, date])
 
-        wb.save("orders.сsv")
+        wb.save("orders.xlsx")
 
-        doc = FSInputFile("orders.сsv")
+        doc = FSInputFile("orders.xlsx")
 
         await message.answer("Всего заказов: " + str(len(orders)))
         await message.answer_document(document=doc)
