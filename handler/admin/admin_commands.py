@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile
 
-import csv
+from openpyxl import Workbook
 
 from config import ADMINS
 from state.energy import Good, UpdateCountGood, DeleteGood, Mailing, Category, DeleteCategory, UpdatePriceGood, \
@@ -434,20 +434,23 @@ async def get_users(message: Message):
 async def get_orders(message: Message):
     if message.from_user.username in ADMINS:
         orders = await db_orders.get_all()
+        name_column = ["id", "Username", "Товар", "Кол-во", "Цена", "Сумма покупки", "Дата покупки"]
+        wb = Workbook()
+        ws = wb.active
+        header = name_column
+        ws.append(header)
+        for item in orders:
+            user = await db_users.get_by_id(item[1])
+            username = user[1]
+            good = await db_goods.get_by_id(item[2])
+            good_name = good[1]
+            price = good[2]
+            count = item[3]
+            sum = price * count
+            date = item[4]
+            ws.append([item[0], username, good_name, count, price, sum, date])
 
-        with open("orders.csv", mode="w", encoding='utf-8') as file:
-            file_writer = csv.writer(file, delimiter=",", lineterminator="\r")
-            file_writer.writerow(["id", "Username", "Товар", "count", "price", "Сумма покупки", "Дата покупки"])
-            for item in orders:
-                user = await db_users.get_by_id(item[1])
-                username = user[1]
-                good = await db_goods.get_by_id(item[2])
-                good_name = good[1]
-                price = good[2]
-                count = item[3]
-                sum = price * count
-                date = item[4]
-                file_writer.writerow([item[0], username, good_name, count, price, sum, date])
+        wb.save("orders.сsv")
 
         doc = FSInputFile("orders.сsv")
 
