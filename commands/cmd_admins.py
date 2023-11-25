@@ -17,4 +17,5 @@ admin_commands = [
     BotCommand(command="/updatedescription", description="Изменить описание товара"),
     BotCommand(command="/updatetitle", description="Изменить название товара"),
     BotCommand(command="/updatecategory", description="Изменить категорию товара"),
+    BotCommand(command="/getorders", description="Посмотреть заказы"),
 ]

@@ -1,7 +1,7 @@
 import logging
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from aiogram.types import BotCommandScopeDefault
+from aiogram.types import BotCommandScopeDefault, BotCommandScopeChat
 
 from handler import start as st
 from handler.user import user_commands
@@ -36,5 +36,7 @@ async def start() -> None:
     dp.include_router(user_commands.router)
     dp.include_router(empty.router)
     bot = Bot(BOT_TOKEN, parse_mode=ParseMode.HTML)
+    for admin in ADMIN_IDS:
+        await bot.set_my_commands(commands=cmd_admins.admin_commands, scope=BotCommandScopeChat(chat_id=admin))
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
