@@ -128,7 +128,7 @@ async def get_id(message: Message, state: FSMContext):
     id = message.text
     await state.update_data(id=id)
     await message.answer("Введите количество напитка")
-    await state.set_state(Good.CHANGE_COUNT)
+    await state.set_state(UpdateCountGood.GET_COUNT)
 
 
 @router.message(UpdateCountGood.GET_COUNT)
@@ -158,10 +158,10 @@ async def update_price_id(message: Message, state: FSMContext):
     id = message.text
     await state.update_data(id=id)
     await message.answer("Введите новую цену напитка")
-    await state.set_state(Good.CHANGE_PRICE)
+    await state.set_state(UpdatePriceGood.GET_PRICE)
 
 
-@router.message(Good.CHANGE_PRICE)
+@router.message(UpdatePriceGood.GET_PRICE)
 async def update_price_price(message: Message, state: FSMContext):
     price = int(message.text)
     await state.update_data(price=price)
