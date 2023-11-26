@@ -39,7 +39,7 @@ async def check(message: Message):
         goods = await db_goods.get_all()
         text = ""
         for item in goods:
-            text = text + f"{item[0]} | {item[1]} {item[5]} | {item[2]} руб/шт | В наличии: {item[3]} шт. \n"
+            text = text + f"{item[0]} | {item[1]} {item[5]} | {item[2]} руб/шт | В наличии: {item[3]} шт. \n\n"
         await message.answer("Вот что у нас есть в наличии:\n\n" + text + "\n\n Всего товаров: " + str(len(goods)))
     else:
         await message.answer("У вас нет доступа к этой команде")
