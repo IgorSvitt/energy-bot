@@ -1,9 +1,11 @@
 from aiogram import Router, F, Bot
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, FSInputFile
+from aiogram.types import Message, FSInputFile, CallbackQuery
 
 from openpyxl import Workbook
+
+from keyboards.admin import for_order
 
 from config import ADMINS
 from state.energy import Good, UpdateCountGood, DeleteGood, Mailing, Category, DeleteCategory, UpdatePriceGood, \
@@ -416,7 +418,7 @@ async def get_users(message: Message):
         users = await db_users.get_all()
         text = ""
         for item in users:
-            text = text + f"{item[0]} | @{item[1]} | Кол-во покупок: {item[2]}\n"
+            text = text + f"{item[0]} | @{item[1]} | Кол-во покупок: {item[2]} | Активен: {item[3]}\n"
 
         with open("users.txt", 'w', encoding='utf-8') as file:
             file.write(text)
@@ -459,24 +461,49 @@ async def get_orders(message: Message):
     else:
         await message.answer("У вас нет доступа к этой команде")
 
-# @router.message(Command('mailing'))
-# async def mailing(message: Message, state: FSMContext):
-#     if message.from_user.username in ADMINS:
-#         await message.answer('Введите текст рассылки')
-#         await state.set_state(Mailing.GET_TEXT)
-#     else:
-#         await message.answer("У вас нет доступа к этой команде")
+@router.message(Command('mailing'))
+async def mailing(message: Message, state: FSMContext):
+    if message.from_user.username in ADMINS:
+        await message.answer('Введите текст рассылки')
+        await state.set_state(Mailing.GET_TEXT)
+    else:
+        await message.answer("У вас нет доступа к этой команде")
+
+
+@router.message(Mailing.GET_TEXT)
+async def get_text(message: Message, state: FSMContext):
+    text = message.text
+    await state.update_data(text=text)
+    await message.answer('Вы уверены, что хотите отправить рассылку?', reply_markup=for_order.admin_mailing())
+
+
+@router.callback_query(F.data == 'send_request')
+async def send_request(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    users = await db_users.get_all()
+    if callback.message.text == "no":
+        data = await state.get_data()
+        text = data.get("text")
+        for user in users:
+            try:
+                await bot.send_message(user[0], text)
+            except Exception as e:
+                await db_users.update_active(user[0], False)
+
+    await state.clear()
+
+
+@router.callback_query(F.data == 'cancel_request')
+async def cancel_request(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback.message.delete()
+
+
+
+
+
 #
 #
-# @router.message(Mailing.GET_TEXT)
-# async def get_text(message: Message, state: FSMContext):
-#     text = message.text
-#     await state.update_data(text=text)
-#     await message.answer('Введите фото')
-#     await state.set_state(Mailing.GET_PHOTO)
-#
-#
-# @router.message(Mailing.GET_PHOTO)
+# @router.message(Mailing.IS_SEND)
 # async def get_photo(message: Message, state: FSMContext, bot: Bot):
 #     users = await db_users.get()
 #     print(users)
@@ -491,17 +518,6 @@ async def get_orders(message: Message):
 #
 #     await state.clear()
 
-
-# @router.message(Command("getorders"))
-# async def get_orders_to_csv(message: Message):
-#     if message.from_user.username in ADMINS:
-#         orders = await db_orders.get_all()
-#         text = ""
-#         for item in orders:
-#             text = text + f"{item[0]} | {item[1]} | {item[2]} | {item[3]} | {item[4]} | {item[5]}\n"
-#         await message.answer("Вот все заказы:\n\n" + text + "\n\n Всего заказов: " + str(len(orders)))
-#     else:
-#         await message.answer("У вас нет доступа к этой команде")
 
 
 

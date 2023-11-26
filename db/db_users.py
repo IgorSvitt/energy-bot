@@ -59,3 +59,11 @@ class Users:
             '''
         )
         return self.cur.fetchall()
+
+    async def update_active(self, userid, is_active):
+        self.cur.execute(
+            '''
+                UPDATE users SET is_active = ? WHERE user_id = ?
+            ''', (is_active, userid)
+        )
+        self.conn.commit()

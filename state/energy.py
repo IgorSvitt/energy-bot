@@ -68,6 +68,7 @@ class BuyGood(StatesGroup):
 class Mailing(StatesGroup):
     GET_TEXT = State()
     GET_PHOTO = State()
+    IS_SEND = State()
 
 
 class Category(StatesGroup):
