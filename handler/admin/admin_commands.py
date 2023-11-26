@@ -32,6 +32,7 @@ async def cancel(message: Message, state: FSMContext):
 ---------------------------------Команды для товаров---------------------------------
 '''
 
+
 # Команда для удаления товара
 @router.message(Command("get"))
 async def check(message: Message):
@@ -480,14 +481,13 @@ async def get_text(message: Message, state: FSMContext):
 @router.callback_query(F.data == 'send_request')
 async def send_request(callback: CallbackQuery, state: FSMContext, bot: Bot):
     users = await db_users.get_all()
-    if callback.message.text == "no":
-        data = await state.get_data()
-        text = data.get("text")
-        for user in users:
-            try:
-                await bot.send_message(user[0], text)
-            except Exception as e:
-                await db_users.update_active(user[0], False)
+    data = await state.get_data()
+    text = data.get("text")
+    for user in users:
+        try:
+            await bot.send_message(user[0], text)
+        except Exception as e:
+            await db_users.update_active(user[0], False)
 
     await state.clear()
 
