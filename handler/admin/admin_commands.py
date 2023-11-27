@@ -41,7 +41,13 @@ async def check(message: Message):
         text = ""
         for item in goods:
             text = text + f"{item[0]} | {item[1]} {item[5]} | {item[2]} руб/шт | В наличии: {item[3]} шт. \n\n"
-        await message.answer("Вот что у нас есть в наличии:\n\n" + text + "\n\n Всего товаров: " + str(len(goods)))
+
+        with open("goods.txt", 'w', encoding='utf-8') as file:
+            file.write(text)
+
+        doc = FSInputFile("goods.txt")
+        await message.answer_document(doc)
+        await message.answer("Всего товаров: " + str(len(goods)))
     else:
         await message.answer("У вас нет доступа к этой команде")
 
