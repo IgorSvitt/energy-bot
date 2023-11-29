@@ -118,7 +118,8 @@ async def except_good(callback: CallbackQuery, state: FSMContext, bot: Bot) -> N
     room = data.get("room")
     user_id = callback.from_user.id
     username = callback.from_user.username
-    await user_methods.send_order_to_admins(user_id=user_id, good_id=id, count=count, room=room, user_name=username, bot=bot)
+    await user_methods.send_order_to_admins(user_id=user_id, good_id=id, count=count, room=room, user_name=username,
+                                            bot=bot)
     await state.clear()
     await good_methods.write_order(user_id=callback.from_user.id, good_id=id, count=count)
     text = "Спасибо за покупку!\n" \
@@ -126,9 +127,11 @@ async def except_good(callback: CallbackQuery, state: FSMContext, bot: Bot) -> N
            "Скоро с вами свяжется наш менеджер. \n\n" \
            "Реквизиты для перевода: \n\n " \
            "Оплата в один клик для пользователей Тинькофф: https://www.tinkoff.ru/rm/lomatov.anton1/5Nr6Y65382/ \n\n" \
-           "Сбер: <code>+79501662315</code>\n\n" \
+           "Сбер: <code>+79501662315</code> (Тыкните на номер, чтобы скопировать его🙃)\n\n" \
            "Можете оплатить сразу или после того, как принесем заказ.\n\n" \
-           "P.S Если вам понравился наш сервис, то, пожалуйста, оставьте отзыв в беседе <a href='https://vk.me/join/sTUXxbQAt1KI_CO7dTq1ypYgYyv1Ica1b10='>лакокрасочных🥺</a>"
+           "P.S Если вам понравился наш сервис, то, пожалуйста, оставьте отзыв в беседе <a href='https://vk.me/join/sTUXxbQAt1KI_CO7dTq1ypYgYyv1Ica1b10='>лакокрасочных🥺</a>\n\n" \
+           "Так же у нас есть <a href='https://t.me/+_M7OES79ggE1YjYy'>чатик</a> для заказа самоката\n\n" \
+           "Если возникли вопросы, то пишите в поддержку📩"
     await callback.message.answer(text)
 
 
@@ -137,10 +140,8 @@ async def write_to_support(message: Message) -> None:
     await message.answer("Напишите в лс @nik0laevig0r или @alomatov")
 
 
-
-
-
-
-
-
-
+@router.message(F.text == "Самокаteam🛴")
+async def go_to_chat(message: Message) -> None:
+    await message.answer("У нас есть сервис по доставке Самоката с 10% скидкой\n"
+                         "Чтобы заказать самокат, перейдите в чатик\n\n"
+                         "👉 https://t.me/+_M7OES79ggE1YjYy 👈")

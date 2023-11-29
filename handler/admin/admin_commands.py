@@ -489,6 +489,7 @@ async def send_request(callback: CallbackQuery, state: FSMContext, bot: Bot):
     users = await db_users.get_all()
     data = await state.get_data()
     text = data.get("text")
+    await callback.message.delete()
     for user in users:
         try:
             await bot.send_message(user[0], text)

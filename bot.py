@@ -25,9 +25,9 @@ async def start() -> None:
     await goods.create_table()
     await orders.create_table()
 
-    #test
-    # await categories.add_test_categories()
-    # await goods.add_test_goods()
+    # test
+    # await categories.create_test_data()
+    # await goods.create_test_data()
 
     dp = Dispatcher()
     logging.basicConfig(level=logging.INFO)

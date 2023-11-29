@@ -18,6 +18,12 @@ class Categories:
         )
         self.conn.commit()
 
+    async def create_test_data(self):
+        self.cur.execute(
+            '''INSERT INTO categories (name) VALUES ("Тестовая категория")'''
+        )
+        self.conn.commit()
+
     async def get_all(self):
         self.cur.execute(
             '''SELECT * FROM categories'''
