@@ -505,8 +505,20 @@ async def cancel_request(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
 
 
+@router.message(Command('off'))
+async def off_bot(message: Message):
+    if message.from_user.username in ADMINS:
+        await message.answer('Бот выключен')
+        with open('bot_status.txt', 'w') as file:
+            file.write('off')
 
 
+@router.message(Command('on'))
+async def on_bot(message: Message):
+    if message.from_user.username in ADMINS:
+        await message.answer('Бот включен')
+        with open('bot_status.txt', 'w') as file:
+            file.write('on')
 
 #
 #

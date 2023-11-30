@@ -9,6 +9,8 @@ from handler.admin import admin_commands
 from handler import empty
 from commands import cmd_admins
 
+from middleware.change_status import BotStatusMiddleware
+
 
 from config import BOT_TOKEN, ADMIN_IDS
 from db import db_users, db_categories, db_goods, db_orders
@@ -30,6 +32,7 @@ async def start() -> None:
     # await goods.create_test_data()
 
     dp = Dispatcher()
+    dp.update.middleware(BotStatusMiddleware())
     logging.basicConfig(level=logging.INFO)
     dp.include_router(st.router)
     dp.include_router(admin_commands.router)
