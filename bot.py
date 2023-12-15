@@ -32,7 +32,6 @@ async def start() -> None:
     # await goods.create_test_data()
 
     dp = Dispatcher()
-    dp.update.middleware(BotStatusMiddleware())
     logging.basicConfig(level=logging.INFO)
     dp.include_router(st.router)
     dp.include_router(admin_commands.router)
