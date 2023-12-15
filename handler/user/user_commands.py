@@ -159,7 +159,14 @@ async def feedback(message: Message, state: FSMContext) -> None:
 async def get_feedback(message: Message, state: FSMContext) -> None:
     await state.update_data(text=message.text)
     await message.answer("Спасибо за ваш отзыв или пожелание!\n"
-                         "Он был отправлен администраторам\n"
-                         "Если вы хотите отправить еще один отзыв или пожелание, то просто напишите его ниже👇")
-    await user_methods.send_feedback_to_admins(message.text)
+                         "Он был отправлен администраторам\n")
+    await state.clear()
+    await user_methods.send_feedback_to_admins(message.text, user_name=message.from_user.username, bot=message.bot)
+
+
+@router.callback_query(F.data == "cancel")
+async def cancel(callback: CallbackQuery, state: FSMContext) -> None:
+    await callback.message.edit_reply_markup()
+    await state.clear()
+    await callback.message.answer("Отменено")
 
