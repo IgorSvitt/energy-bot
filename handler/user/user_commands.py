@@ -147,7 +147,7 @@ async def go_to_chat(message: Message) -> None:
                          "👉 https://t.me/+_M7OES79ggE1YjYy 👈")
 
 
-@router.message(F.text == "Отзыв/Пожелания")
+@router.message(F.text == "Отзыв/Пожелания💌")
 async def feedback(message: Message, state: FSMContext) -> None:
     await message.answer("Здесь вы можете написать свой отзыв или пожелание\n"
                          "Все отзывы будут отправлены администраторам ананимно\n")
