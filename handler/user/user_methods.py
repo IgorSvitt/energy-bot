@@ -21,3 +21,12 @@ async def send_order_to_admins(good_id, count, room, user_name, user_id, bot: Bo
                                       f"user: @{user_name}")
 
 
+async def send_feedback_to_admins(text, user_name, bot: Bot):
+    admins = ADMIN_IDS
+    text = f"Новый отзыв:\n" \
+           f"{text}\n" \
+           f"user: @{user_name}"
+    for admin in admins:
+        await bot.send_message(admin, text=text)
+
+

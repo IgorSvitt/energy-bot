@@ -21,6 +21,11 @@ def back_buy_button() -> InlineKeyboardMarkup:
     builder.row(types.InlineKeyboardButton(text="Отмена", callback_data="back_buy"))
     return builder.as_markup()
 
+def cancel() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.row(types.InlineKeyboardButton(text="Отмена", callback_data="cancel"))
+    return builder.as_markup()
+
 
 def categories_buy_buttons(categories) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()

@@ -82,3 +82,8 @@ class DeleteCategory(StatesGroup):
 class UpdateCategory(StatesGroup):
     GET_ID = State()
     GET_TITLE = State()
+
+
+class Feedback(StatesGroup):
+    GET_TEXT = State()
+    IS_SEND = State()

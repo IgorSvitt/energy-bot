@@ -5,7 +5,7 @@ from aiogram.types import Message, CallbackQuery
 from handler.user import good_methods
 from keyboards.user import for_goods
 from handler.user import user_methods
-from state.energy import BuyGood
+from state.energy import BuyGood, Feedback
 
 router = Router()
 
@@ -145,3 +145,21 @@ async def go_to_chat(message: Message) -> None:
     await message.answer("У нас есть сервис по доставке Самоката с 10% скидкой\n"
                          "Чтобы заказать самокат, перейдите в чатик\n\n"
                          "👉 https://t.me/+_M7OES79ggE1YjYy 👈")
+
+
+@router.message(F.text == "Отзыв/Пожелания")
+async def feedback(message: Message, state: FSMContext) -> None:
+    await message.answer("Здесь вы можете написать свой отзыв или пожелание\n"
+                         "Все отзывы будут отправлены администраторам ананимно\n")
+    await message.answer("Напишите ваш отзыв или пожелание ниже👇", reply_markup=for_goods.cancel())
+    await state.set_state(Feedback.GET_TEXT)
+
+
+@router.message(Feedback.GET_TEXT)
+async def get_feedback(message: Message, state: FSMContext) -> None:
+    await state.update_data(text=message.text)
+    await message.answer("Спасибо за ваш отзыв или пожелание!\n"
+                         "Он был отправлен администраторам\n"
+                         "Если вы хотите отправить еще один отзыв или пожелание, то просто напишите его ниже👇")
+    await user_methods.send_feedback_to_admins(message.text)
+
